@@ -16,19 +16,22 @@ Pan-tilt tracking (PCA9685):
 https://github.com/ArduCAM/PCA9685
 """
 
+from __future__ import annotations
+
 import sys
 from pathlib import Path
-from typing import Optional, Tuple
 
 # Allow running from project root when ultralytics is the package
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from ultralytics import YOLO
 import cv2
+
+from ultralytics import YOLO
 
 # Optional: Raspberry Pi Camera Module 3 / Arducam (picamera2, libcamera)
 try:
     from picamera2 import Picamera2
+
     PICAMERA2_AVAILABLE = True
 except ImportError:
     Picamera2 = None  # type: ignore
@@ -44,7 +47,7 @@ except ImportError:
 PERSON_CLASS_ID = 0
 
 
-def _box_center_xy(box) -> Tuple[float, float]:
+def _box_center_xy(box) -> tuple[float, float]:
     """Return (center_x, center_y) of a YOLO box (xyxy format)."""
     xyxy = box.xyxy[0]
     x1, y1, x2, y2 = float(xyxy[0]), float(xyxy[1]), float(xyxy[2]), float(xyxy[3])
@@ -77,11 +80,11 @@ def main(
     use_rpi_camera: bool = False,
     rpi_camera_width: int = 1280,
     rpi_camera_height: int = 720,
-    servo_channel: Optional[int] = None,
+    servo_channel: int | None = None,
     servo_angle_detected: float = 90.0,
     servo_angle_none: float = 0.0,
-    pan_channel: Optional[int] = None,
-    tilt_channel: Optional[int] = None,
+    pan_channel: int | None = None,
+    tilt_channel: int | None = None,
     pan_min: float = 30.0,
     pan_max: float = 150.0,
     tilt_min: float = 45.0,
@@ -92,11 +95,10 @@ def main(
     pca9685_address: int = 0x40,
     pca9685_bus: int = 1,
 ):
-    """
-    Run human detection on the default camera.
+    """Run human detection on the default camera.
 
-    Pan-tilt tracking: when pan_channel and tilt_channel are set, the servos scan back and forth
-    until a person is detected, then track the center of the person (largest detection).
+    Pan-tilt tracking: when pan_channel and tilt_channel are set, the servos scan back and forth until a person is
+    detected, then track the center of the person (largest detection).
     """
     track_mode = pan_channel is not None and tilt_channel is not None
     pca = None
@@ -113,9 +115,13 @@ def main(
                 print("Warning: PCA9685 not available (I2C/smbus?). Servo disabled.")
                 track_mode = False
             elif track_mode:
-                print(f"Pan-tilt tracking: pan ch {pan_channel}, tilt ch {tilt_channel}. Scan when no person, track center when person detected.")
+                print(
+                    f"Pan-tilt tracking: pan ch {pan_channel}, tilt ch {tilt_channel}. Scan when no person, track center when person detected."
+                )
             else:
-                print(f"Servo on PCA9685 channel {servo_channel}: angle {servo_angle_none}° (no human) / {servo_angle_detected}° (human).")
+                print(
+                    f"Servo on PCA9685 channel {servo_channel}: angle {servo_angle_none}° (no human) / {servo_angle_detected}° (human)."
+                )
 
     print(f"Loading model: {model_name}")
     model = YOLO(model_name)
