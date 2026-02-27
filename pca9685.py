@@ -10,9 +10,7 @@ Requires: smbus (on Raspberry Pi: enable I2C in raspi-config, then pip install s
 
 from __future__ import annotations
 
-import math
 import time
-from typing import Optional
 
 # Default I2C address for PCA9685
 PCA9685_ADDRESS = 0x40
@@ -41,24 +39,23 @@ def _get_bus(bus_id: int):
     """Import and return SMBus. Prefer smbus2; fallback to smbus."""
     try:
         import smbus2
+
         return smbus2.SMBus(bus_id)
     except ImportError:
         try:
             import smbus
+
             return smbus.SMBus(bus_id)
         except ImportError:
             raise ImportError(
-                "PCA9685 requires smbus. On Raspberry Pi: sudo apt install python3-smbus, "
-                "or pip install smbus2"
+                "PCA9685 requires smbus. On Raspberry Pi: sudo apt install python3-smbus, or pip install smbus2"
             ) from None
 
 
 class PCA9685:
-    """
-    16-channel PWM servo driver via I2C (PCA9685).
+    """16-channel PWM servo driver via I2C (PCA9685).
 
-    Use setPWMFreq(50) for servos, then setServoPulse(channel, pulse_us)
-    or setRotationAngle(channel, angle_0_180).
+    Use setPWMFreq(50) for servos, then setServoPulse(channel, pulse_us) or setRotationAngle(channel, angle_0_180).
     """
 
     def __init__(
@@ -88,7 +85,7 @@ class PCA9685:
         prescale_val /= float(PWM_RESOLUTION)
         prescale_val /= float(freq)
         prescale_val -= 1.0
-        prescale = int(round(prescale_val))
+        prescale = round(prescale_val)
         if self._debug:
             print(f"Setting PWM frequency to {freq} Hz, prescale={prescale}")
 
@@ -111,9 +108,8 @@ class PCA9685:
         self._write(base + 3, off >> 8)
 
     def setServoPulse(self, channel: int, pulse_us: float) -> None:
-        """
-        Set servo pulse width in microseconds (e.g. 1000–2000 for 0–180°).
-        PWM frequency must be 50 Hz (call setPWMFreq(50) first).
+        """Set servo pulse width in microseconds (e.g. 1000–2000 for 0–180°). PWM frequency must be 50 Hz (call
+        setPWMFreq(50) first).
         """
         # pulse_us / period_us = tick / 4096  =>  tick = pulse_us * 4096 / 20000
         tick = int(pulse_us * PWM_RESOLUTION / PWM_PERIOD_US)
@@ -121,9 +117,7 @@ class PCA9685:
         self.setPWM(channel, 0, tick)
 
     def setRotationAngle(self, channel: int, angle: float) -> None:
-        """
-        Set servo angle in degrees (0–180).
-        Maps 0° → ~500 µs, 180° → ~2500 µs (adjust for your servo).
+        """Set servo angle in degrees (0–180). Maps 0° → ~500 µs, 180° → ~2500 µs (adjust for your servo).
         """
         if not 0 <= angle <= 180:
             raise ValueError("angle must be 0–180")
@@ -149,10 +143,8 @@ def create_pca9685(
     bus_id: int = 1,
     servo_freq: int = SERVO_FREQ_HZ,
     debug: bool = False,
-) -> Optional[PCA9685]:
-    """
-    Create and initialize a PCA9685 for servo use.
-    Returns None if I2C/smbus is not available (e.g. not on a Pi).
+) -> PCA9685 | None:
+    """Create and initialize a PCA9685 for servo use. Returns None if I2C/smbus is not available (e.g. not on a Pi).
     """
     try:
         pca = PCA9685(address=address, bus_id=bus_id, debug=debug)

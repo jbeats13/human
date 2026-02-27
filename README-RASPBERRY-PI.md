@@ -34,8 +34,8 @@ Reboot if prompted.
 ```bash
 # System
 sudo apt install -y python3-venv python3-pip
-sudo apt install -y libopencv-dev python3-opencv   # OpenCV
-sudo apt install -y python3-smbus                 # I2C for PCA9685
+sudo apt install -y libopencv-dev python3-opencv # OpenCV
+sudo apt install -y python3-smbus                # I2C for PCA9685
 
 # picamera2 (usually pre-installed on Raspberry Pi OS)
 sudo apt install -y python3-picamera2
@@ -47,7 +47,7 @@ Create a venv and install the project (from the repo root):
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e .
-pip install opencv-python-headless   # if needed for display
+pip install opencv-python-headless # if needed for display
 ```
 
 ---
@@ -105,29 +105,29 @@ python human_detector.py --no-show
 
 ## 5. Hardware summary
 
-| Component        | Purpose                                                    |
-|------------------|------------------------------------------------------------|
-| Raspberry Pi     | Host (Pi 4/5 recommended)                                 |
-| Camera Module 3 / Arducam | CSI camera (picamera2)                            |
-| PCA9685          | Optional; I2C servo driver (e.g. ArduCAM pan-tilt board)  |
-| 2× servos        | Pan + tilt for scan & track mode (channel 0 = pan, 1 = tilt typical) |
+| Component                 | Purpose                                                              |
+| ------------------------- | -------------------------------------------------------------------- |
+| Raspberry Pi              | Host (Pi 4/5 recommended)                                            |
+| Camera Module 3 / Arducam | CSI camera (picamera2)                                               |
+| PCA9685                   | Optional; I2C servo driver (e.g. ArduCAM pan-tilt board)             |
+| 2× servos                 | Pan + tilt for scan & track mode (channel 0 = pan, 1 = tilt typical) |
 
 ---
 
 ## 6. Troubleshooting
 
-- **“Could not open camera”**  
-  - With Pi Camera: enable Camera in `raspi-config`, check cable and connector.  
+- **“Could not open camera”**
+  - With Pi Camera: enable Camera in `raspi-config`, check cable and connector.
   - With USB: try `--no-rpi-camera` and ensure the webcam is not in use elsewhere.
 
-- **“picamera2 not found”**  
-  - Install: `sudo apt install python3-picamera2`  
+- **“picamera2 not found”**
+  - Install: `sudo apt install python3-picamera2`
   - Use USB camera: `python human_detector.py --no-rpi-camera`
 
-- **“PCA9685 not available”**  
-  - Enable I2C in `raspi-config`.  
-  - Install: `sudo apt install python3-smbus` (or `pip install smbus2`).  
+- **“PCA9685 not available”**
+  - Enable I2C in `raspi-config`.
+  - Install: `sudo apt install python3-smbus` (or `pip install smbus2`).
   - Check wiring and I2C address (default 0x40).
 
-- **Slow or low FPS**  
+- **Slow or low FPS**
   - Use `yolo11n.pt`, lower resolution (e.g. `--rpi-camera-width 640 --rpi-camera-height 480`), or a faster Pi (e.g. Pi 5).
